@@ -1,11 +1,19 @@
 package com.stevenpaw.fightvalley.main;
 
+import com.stevenpaw.fightvalley.common.commands.CMDfightvalley;
+import com.stevenpaw.fightvalley.common.utils.RunnableClass;
+import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.ServicesManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
+
+import java.io.File;
+import java.util.Objects;
 
 public class Main extends JavaPlugin {
 
@@ -15,13 +23,18 @@ public class Main extends JavaPlugin {
     private Permission perms = null;
     private Chat chat = null;
 
+    public static String prefix = "§e[FightValley] ";
+    public static File file;
+    public static FileConfiguration cfg;
+
     public static Main getPlugin() {
         return plugin;
     }
 
     @Override
     public void onDisable() {
-        getLogger().info(String.format("[%s] Disabled Version %s", getDescription().getName(), getDescription().getVersion()));
+        MySQL.disconnect();
+        getLogger().info(String.format(this.prefix + "Disabled Version %s", getDescription().getName(), getDescription().getVersion()));
     }
 
     @Override
@@ -31,10 +44,26 @@ public class Main extends JavaPlugin {
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
+        plugin = this;
         setupPermissions();
         setupChat();
+        setupConfig();
 
-        getLogger().info(String.format("[%s] Enabled Version %s", getDescription().getName(), getDescription().getVersion()));
+        MySQL.setupMySQL();
+        Bukkit.getScheduler().runTaskTimer(this, RunnableClass::runMinute, 20, 20*60);
+
+        Objects.requireNonNull(getCommand("fightvalley")).setExecutor(new CMDfightvalley());
+
+        getLogger().info(String.format(this.prefix + "Enabled Version %s", getDescription().getName(), getDescription().getVersion()));
+    }
+
+    /**
+     * Erstelle und lade die Config
+     */
+    private void setupConfig(){
+        saveDefaultConfig();
+        file = new File(Main.getPlugin().getDataFolder().getAbsolutePath()+ "/config.yml");
+        cfg = YamlConfiguration.loadConfiguration(file);
     }
 
     private boolean setupEconomy() {
