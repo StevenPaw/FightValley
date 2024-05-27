@@ -1,0 +1,12 @@
+name: FightValley
+version: 0.1
+main: com.stevenpaw.fightvalley.main.Main
+description: A fighting plugin for Minecraft
+author: StevenPaw
+website: stevenpaw.com
+api-version: '1.20.6'
+depend: [ Vault ]
+commands:
+  joinarena:
+   description: Tritt einer Arena bei
+   aliases: [arenajoin]

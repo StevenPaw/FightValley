@@ -1,0 +1,12 @@
+# FightValley-CONFIG
+#
+# DATENBANK:
+#
+MySQL:
+  host: ''
+  port: ''
+  database: ''
+  user: ''
+  password: ''
+#
+#
