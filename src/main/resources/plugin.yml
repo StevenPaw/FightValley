@@ -9,4 +9,3 @@ depend: [ Vault ]
 commands:
   fightvalley:
    description: Fightvalley main command
-   aliases: [arenajoin]

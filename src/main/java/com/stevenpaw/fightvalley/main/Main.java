@@ -1,8 +1,11 @@
 package com.stevenpaw.fightvalley.main;
 
+import com.stevenpaw.fightvalley.common.arena.Arena;
 import com.stevenpaw.fightvalley.common.commands.CMDfightvalley;
+import com.stevenpaw.fightvalley.common.database.SQL_Arena;
 import com.stevenpaw.fightvalley.common.utils.RunnableClass;
 import org.bukkit.Bukkit;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -13,6 +16,8 @@ import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 
 public class Main extends JavaPlugin {
@@ -31,6 +36,9 @@ public class Main extends JavaPlugin {
         return plugin;
     }
 
+    public static HashMap<String, Arena> arenas;
+    public static int defaultArenaTime = 120;
+
     @Override
     public void onDisable() {
         MySQL.disconnect();
@@ -39,17 +47,21 @@ public class Main extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        plugin = this;
+
         if (!setupEconomy() ) {
             getLogger().severe(String.format("Disabled due to no Vault dependency found!", getDescription().getName()));
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
-        plugin = this;
         setupPermissions();
         setupChat();
         setupConfig();
-
         MySQL.setupMySQL();
+
+        arenas = new HashMap<>();
+        arenas = SQL_Arena.getArenas();
+        Bukkit.getScheduler().runTaskTimer(this, RunnableClass::runSecond, 20, 20);
         Bukkit.getScheduler().runTaskTimer(this, RunnableClass::runMinute, 20, 20*60);
 
         Objects.requireNonNull(getCommand("fightvalley")).setExecutor(new CMDfightvalley());

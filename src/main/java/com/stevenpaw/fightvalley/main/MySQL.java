@@ -1,5 +1,7 @@
 package com.stevenpaw.fightvalley.main;
 
+import com.stevenpaw.fightvalley.common.database.SQL_Arena;
+import com.stevenpaw.fightvalley.common.database.SQL_ArenaSpawn;
 import com.stevenpaw.fightvalley.common.database.SQL_Player;
 import org.bukkit.Bukkit;
 
@@ -82,5 +84,7 @@ public class MySQL {
 
     public static void createTable() {
         SQL_Player.createPlayerTable();
+        SQL_Arena.createArenaTable();
+        SQL_ArenaSpawn.createArenaSpawnTable();
     }
 }
