@@ -20,13 +20,16 @@ public class ArenaSidebar {
         obj.setDisplaySlot(DisplaySlot.SIDEBAR);
 
         Score players = obj.getScore(ChatColor.GRAY + "» Players: " + arena.getPlayers().size() + "/" + arena.getMaxPlayers());
-        players.setScore(0);
+        players.setScore(1);
 
-        Score kills = obj.getScore(ChatColor.GRAY + "» Kills: 0");
-        kills.setScore(0);
+        Score kills = obj.getScore(ChatColor.GRAY + "» Kills:  " + ArenaPlayer.GetArenaPlayer(player).getKills());
+        kills.setScore(1);
 
-        Score deaths = obj.getScore(ChatColor.GRAY + "» Deaths: 0");
-        deaths.setScore(0);
+        Score streak = obj.getScore(ChatColor.GRAY + "» Streak:  " + ArenaPlayer.GetArenaPlayer(player).getStreak());
+        streak.setScore(1);
+
+        Score deaths = obj.getScore(ChatColor.GRAY + "» Deaths: " + ArenaPlayer.GetArenaPlayer(player).getDeaths());
+        deaths.setScore(1);
 
         if(arena.getState() == ArenaStates.RUNNING){
             Score time = obj.getScore(ChatColor.GRAY + "» Time: " + arena.timeLeft());
@@ -34,8 +37,8 @@ public class ArenaSidebar {
         } else if (arena.getState() == ArenaStates.STARTING){
             Score time = obj.getScore(ChatColor.GRAY + "» Start in: " + arena.timeLeft());
             time.setScore(0);
-        } else if (arena.getState() == ArenaStates.COUNTDOWN){
-            Score time = obj.getScore(ChatColor.GRAY + "» Game starts in: " + arena.timeLeft());
+        } else if (arena.getState() == ArenaStates.WAITING){
+            Score time = obj.getScore(ChatColor.GRAY + " " + arena.timeLeft());
             time.setScore(0);
         }
 

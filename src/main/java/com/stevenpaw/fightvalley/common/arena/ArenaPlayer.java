@@ -2,9 +2,11 @@ package com.stevenpaw.fightvalley.common.arena;
 
 import com.stevenpaw.fightvalley.common.database.SQL_Player;
 import com.stevenpaw.fightvalley.common.utils.Util_InventoryEncoder;
+import com.stevenpaw.fightvalley.common.weapons.IWeapon;
 import com.stevenpaw.fightvalley.main.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import java.io.IOException;
@@ -18,6 +20,7 @@ public class ArenaPlayer {
     private int highestStreak;
     private Arena currentArena;
     private GameMode gameModeOutsideOfArena;
+    private IWeapon currentWeapon;
 
     public ArenaPlayer(UUID uuid, Arena currentArena, GameMode gameModeOutsideOfArena) {
         this.uuid = uuid;
@@ -170,5 +173,38 @@ public class ArenaPlayer {
     public void addDeath() {
         deaths++;
         streak = 0;
+    }
+
+    public static boolean isInArena(Player player) {
+        ArenaPlayer ap = ArenaPlayer.GetArenaPlayer(player);
+        return ap.getCurrentArena() != null;
+    }
+
+    public int getDeaths() {
+        return deaths;
+    }
+
+    public int getKills() {
+        return kills;
+    }
+
+    public int getStreak() {
+        return streak;
+    }
+
+    public int getHighestStreak() {
+        return highestStreak;
+    }
+
+    public void setCurrentWeapon(IWeapon weapon) {
+        this.currentWeapon = weapon;
+    }
+
+    public IWeapon getCurrentWeapon() {
+        return currentWeapon;
+    }
+
+    public OfflinePlayer getOfflinePlayer() {
+        return Bukkit.getOfflinePlayer(uuid);
     }
 }

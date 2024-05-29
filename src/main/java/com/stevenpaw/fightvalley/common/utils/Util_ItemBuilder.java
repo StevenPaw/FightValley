@@ -82,6 +82,11 @@ public class Util_ItemBuilder {
         return this;
     }
 
+    public Util_ItemBuilder setEnchantment(Enchantment enchantment, int level) {
+        itemMeta.addEnchant(enchantment, level, true);
+        return this;
+    }
+
     /**
      * Setze die Lore des Items aus einer Liste
      * @param lore (List) = Liste

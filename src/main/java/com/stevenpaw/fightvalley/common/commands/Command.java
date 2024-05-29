@@ -339,7 +339,7 @@ public class Command implements TabExecutor {
 
             ArenaPlayer ap = ArenaPlayer.GetArenaPlayer(p.getUniqueId());
 
-            if (Main.arenas.get(name).getState() == ArenaStates.WAITING) {
+            if (Main.arenas.get(name).getState() == ArenaStates.WAITING || Main.arenas.get(name).getState() == ArenaStates.STARTING) {
                 Main.arenas.get(name).joinArena(ap);
                 sender.sendMessage("§6You joined Arena §c" + name + "§6...");
             } else if (Main.arenas.get(name).getState() == ArenaStates.DISABLED){
@@ -395,7 +395,11 @@ public class Command implements TabExecutor {
         sender.sendMessage("§6Listing " + players.size() + " Players...");
         for (Map.Entry<UUID, ArenaPlayer> entry : players.entrySet()) {
             ArenaPlayer v = entry.getValue();
-            sender.sendMessage(v.getPlayer().getName() + " | In Arena: " + v.getCurrentArena().getName());
+            if(v.getCurrentArena() != null) {
+                sender.sendMessage(v.getOfflinePlayer().getName() + " | In Arena: " + v.getCurrentArena().getName() + " | HighestStreak: " + v.getHighestStreak());
+            } else {
+                sender.sendMessage(v.getOfflinePlayer().getName() + " | Not in an Arena" + " | HighestStreak: " + v.getHighestStreak());
+            }
         }
         sender.sendMessage("--------------------");
     }
