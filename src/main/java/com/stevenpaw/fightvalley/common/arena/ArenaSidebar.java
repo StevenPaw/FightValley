@@ -11,27 +11,16 @@ import org.bukkit.scoreboard.Scoreboard;
 public class ArenaSidebar {
 
     public static void setScoreBoard(Player player, Arena arena) {
-        Scoreboard board = Bukkit.getScoreboardManager().getNewScoreboard();
-        Objective obj = board.registerNewObjective("FightValley", "dummy", arena.getName());
-        obj.setDisplaySlot(DisplaySlot.SIDEBAR);
-        player.setScoreboard(board);
-
-        Score kills = obj.getScore(ChatColor.GRAY + "» Kills");
-        kills.setScore(0);
-
-        Score deaths = obj.getScore(ChatColor.GRAY + "» Deaths");
-        deaths.setScore(0);
-
-        if(arena.getState() == ArenaStates.RUNNING) {
-            Score time = obj.getScore("Time: " + arena.timeLeft());
-            time.setScore(0);
-        }
+        updateScoreboard(player, arena);
     }
 
-    public static void updateScore(Player player, Arena arena) {
+    public static void updateScoreboard(Player player, Arena arena) {
         Scoreboard board = Bukkit.getScoreboardManager().getNewScoreboard();
-        Objective obj = board.registerNewObjective("FightValley", "dummy", arena.getName());
+        Objective obj = board.registerNewObjective("FightValley", "dummy", "FightValley - " + arena.getName());
         obj.setDisplaySlot(DisplaySlot.SIDEBAR);
+
+        Score players = obj.getScore(ChatColor.GRAY + "» Players: " + arena.getPlayers().size() + "/" + arena.getMaxPlayers());
+        players.setScore(0);
 
         Score kills = obj.getScore(ChatColor.GRAY + "» Kills: 0");
         kills.setScore(0);
@@ -39,8 +28,14 @@ public class ArenaSidebar {
         Score deaths = obj.getScore(ChatColor.GRAY + "» Deaths: 0");
         deaths.setScore(0);
 
-        if(arena.getState() == ArenaStates.RUNNING) {
+        if(arena.getState() == ArenaStates.RUNNING){
             Score time = obj.getScore(ChatColor.GRAY + "» Time: " + arena.timeLeft());
+            time.setScore(0);
+        } else if (arena.getState() == ArenaStates.STARTING){
+            Score time = obj.getScore(ChatColor.GRAY + "» Start in: " + arena.timeLeft());
+            time.setScore(0);
+        } else if (arena.getState() == ArenaStates.COUNTDOWN){
+            Score time = obj.getScore(ChatColor.GRAY + "» Game starts in: " + arena.timeLeft());
             time.setScore(0);
         }
 

@@ -108,7 +108,7 @@ public class SQL_ArenaSpawn {
             final ResultSet res = MySQL.getResult("SELECT * FROM FightValley_ArenaSpawn WHERE Arena= '" + arena + "'");
             assert res != null;
             while (res.next()) {
-                locs.add(new Location(null, res.getDouble("SpawnX"), res.getDouble("SpawnY"), res.getDouble("SpawnZ")));
+                locs.add(new Location(SQL_Arena.getLobby(arena).getWorld(), res.getDouble("SpawnX"), res.getDouble("SpawnY"), res.getDouble("SpawnZ")).add(0.5, 0, 0.5));
             }
             return locs;
         }

@@ -1,11 +1,12 @@
 package com.stevenpaw.fightvalley.main;
 
 import com.stevenpaw.fightvalley.common.arena.Arena;
-import com.stevenpaw.fightvalley.common.commands.CMDfightvalley;
+import com.stevenpaw.fightvalley.common.arena.ArenaPlayer;
+import com.stevenpaw.fightvalley.common.commands.Command;
 import com.stevenpaw.fightvalley.common.database.SQL_Arena;
+import com.stevenpaw.fightvalley.common.database.SQL_Player;
 import com.stevenpaw.fightvalley.common.utils.RunnableClass;
 import org.bukkit.Bukkit;
-import org.bukkit.command.TabCompleter;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -17,8 +18,8 @@ import net.milkbowl.vault.permission.Permission;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 public class Main extends JavaPlugin {
 
@@ -37,10 +38,14 @@ public class Main extends JavaPlugin {
     }
 
     public static HashMap<String, Arena> arenas;
+    public static HashMap<UUID, ArenaPlayer> arenaPlayers;
     public static int defaultArenaTime = 120;
 
     @Override
     public void onDisable() {
+        arenas.forEach((k, v) -> {
+            v.EndGame();
+        });
         MySQL.disconnect();
         getLogger().info(String.format(this.prefix + "Disabled Version %s", getDescription().getName(), getDescription().getVersion()));
     }
@@ -61,10 +66,14 @@ public class Main extends JavaPlugin {
 
         arenas = new HashMap<>();
         arenas = SQL_Arena.getArenas();
+        arenaPlayers = new HashMap<>();
+        arenaPlayers = SQL_Player.getAllPlayers();
+
         Bukkit.getScheduler().runTaskTimer(this, RunnableClass::runSecond, 20, 20);
         Bukkit.getScheduler().runTaskTimer(this, RunnableClass::runMinute, 20, 20*60);
 
-        Objects.requireNonNull(getCommand("fightvalley")).setExecutor(new CMDfightvalley());
+        Objects.requireNonNull(getCommand("fightvalley")).setExecutor(new Command());
+        Objects.requireNonNull(getCommand("fv")).setExecutor(new Command());
 
         getLogger().info(String.format(this.prefix + "Enabled Version %s", getDescription().getName(), getDescription().getVersion()));
     }

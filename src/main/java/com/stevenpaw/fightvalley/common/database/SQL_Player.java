@@ -1,12 +1,15 @@
 package com.stevenpaw.fightvalley.common.database;
 
+import com.stevenpaw.fightvalley.common.arena.Arena;
+import com.stevenpaw.fightvalley.common.arena.ArenaPlayer;
+import com.stevenpaw.fightvalley.main.Main;
 import com.stevenpaw.fightvalley.main.MySQL;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
+import org.bukkit.GameMode;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
+import java.util.HashMap;
 import java.util.UUID;
 
 public class SQL_Player {
@@ -17,7 +20,13 @@ public class SQL_Player {
     public static void createPlayerTable() {
         if (MySQL.isConnected()) {
             try {
-                MySQL.con.createStatement().executeUpdate("CREATE TABLE IF NOT EXISTS FightValley_Player (UUID VARCHAR(100) PRIMARY KEY, Money DOUBLE, LastOn VARCHAR(50))");
+                MySQL.con.createStatement().executeUpdate("CREATE TABLE IF NOT EXISTS FightValley_Player (" +
+                        "UUID VARCHAR(100) PRIMARY KEY, " +
+                        "HighestStreak INT, " +
+                        "CurrentArena VARCHAR(255), " +
+                        "GameModeOutside VARCHAR(255), " +
+                        "InventoryOutside TEXT" +
+                        ")");
             }
             catch (SQLException e) {
                 e.printStackTrace();
@@ -31,7 +40,7 @@ public class SQL_Player {
      */
     public static void createPlayer(final UUID uuid) {
         if (!playerExists(uuid)) {
-            MySQL.update("INSERT INTO FightValley_Player (UUID, Money, LastOn) VALUES ('"+uuid+"','0.0',NULL)");
+            MySQL.update("INSERT INTO FightValley_Player (UUID, HighestStreak, CurrentArena, GameModeOutside) VALUES ('" + uuid + "','0','','" + Bukkit.getPlayer(uuid).getGameMode().toString() + "')");
         }
     }
 
@@ -125,5 +134,24 @@ public class SQL_Player {
             }
         }
         return null;
+    }
+
+    public static HashMap<UUID, ArenaPlayer> getAllPlayers() {
+        HashMap<UUID, ArenaPlayer> players = new HashMap<>();
+        try {
+            ResultSet rs = MySQL.getResult("SELECT * FROM FightValley_Player");
+            while (rs.next()) {
+                UUID uuid = UUID.fromString(rs.getString("UUID"));
+                int highestStreak = rs.getInt("HighestStreak");
+                Arena currentArena = Main.arenas.get(rs.getString("CurrentArena"));
+                GameMode gameModeOutside = GameMode.valueOf(rs.getString("GameModeOutside"));
+
+                ArenaPlayer ap = new ArenaPlayer(uuid, currentArena, gameModeOutside, highestStreak);
+                players.put(uuid, ap);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return players;
     }
 }

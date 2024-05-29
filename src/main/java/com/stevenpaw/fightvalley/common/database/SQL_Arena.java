@@ -1,10 +1,13 @@
 package com.stevenpaw.fightvalley.common.database;
 
 import com.stevenpaw.fightvalley.common.arena.Arena;
+import com.stevenpaw.fightvalley.common.arena.ArenaPlayer;
 import com.stevenpaw.fightvalley.main.Main;
 import com.stevenpaw.fightvalley.main.MySQL;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -62,6 +65,7 @@ public class SQL_Arena {
     public static void deleteArena(String name) {
         if (arenaExists(name)) {
             MySQL.update("DELETE FROM FightValley_Arena WHERE Name= '" + name + "'");
+            SQL_ArenaSpawn.deleteAllArenaSpawns(name);
         }
     }
 
@@ -191,11 +195,43 @@ public class SQL_Arena {
         }
     }
 
+    public static Boolean hasLobby(String name) {
+        return getString(name, "LobbyWorld") != null;
+    }
+
+    public static Boolean hasExit(String name) {
+        return getString(name, "ExitWorld") != null;
+    }
+
     public static Location getLobby(String name) {
-        return new Location(Bukkit.getWorld(getString(name, "LobbyWorld")), getDouble(name, "LobbyX"), getDouble(name, "LobbyY"), getDouble(name, "LobbyZ"));
+        return new Location(Bukkit.getWorld(getString(name, "LobbyWorld")), getDouble(name, "LobbyX"), getDouble(name, "LobbyY"), getDouble(name, "LobbyZ")).add(0.5, 0, 0.5);
     }
 
     public static Location getExit(String name) {
-        return new Location(Bukkit.getWorld(getString(name, "ExitWorld")), getDouble(name, "ExitX"), getDouble(name, "ExitY"), getDouble(name, "ExitZ"));
+        return new Location(Bukkit.getWorld(getString(name, "ExitWorld")), getDouble(name, "ExitX"), getDouble(name, "ExitY"), getDouble(name, "ExitZ")).add(0.5, 0, 0.5);
+    }
+
+    public static HashMap<UUID, ArenaPlayer> getArenaPlayers() {
+        HashMap<UUID, ArenaPlayer> players = new HashMap<>();
+        try {
+            final ResultSet res = MySQL.getResult("SELECT * FROM FightValley_Player");
+            assert res != null;
+            while (res.next()) {
+                Arena playerArena = Main.arenas.get(res.getString("CurrentArena"));
+                GameMode playerGamemode = GameMode.SURVIVAL;
+                try{
+                    playerGamemode = GameMode.valueOf(res.getString("GamemodeOutside"));
+                } catch (IllegalArgumentException e) {
+                    playerGamemode = GameMode.SURVIVAL;
+                }
+                ArenaPlayer player = new ArenaPlayer(UUID.fromString(res.getString("UUID")), playerArena, playerGamemode);
+                players.put(player.getUUID(), player);
+            }
+            return players;
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

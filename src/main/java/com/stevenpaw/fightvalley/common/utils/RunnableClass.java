@@ -20,9 +20,7 @@ public class RunnableClass {
         if(Main.arenas.size() > 0) {
             //loop through all arenas
             Main.arenas.forEach((k, v) -> {
-                if(v.getState() == ArenaStates.RUNNING) {
-                    v.Tick();
-                }
+                v.Tick();
             });
         }
     }
