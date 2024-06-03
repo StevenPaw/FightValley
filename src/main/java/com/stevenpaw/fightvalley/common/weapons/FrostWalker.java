@@ -2,9 +2,15 @@ package com.stevenpaw.fightvalley.common.weapons;
 
 import com.stevenpaw.fightvalley.common.arena.ArenaPlayer;
 import com.stevenpaw.fightvalley.common.utils.Util_ItemBuilder;
+import com.stevenpaw.fightvalley.main.Main;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 public class FrostWalker implements IWeapon {
     @Override
@@ -14,7 +20,14 @@ public class FrostWalker implements IWeapon {
 
     @Override
     public void activate(ArenaPlayer ap) {
-        //ap.getPlayer().sendMessage("You are in an arena and using a sword!");
+        ap.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 10, 1, false, true));
+        ap.getPlayer().spawnParticle(Particle.SNOWFLAKE, ap.getPlayer().getLocation(), 50);
+        //Set Fire if air block
+        Location loc = ap.getPlayer().getLocation();
+        if(loc.getBlock().getType() == Material.AIR) {
+            loc.getBlock().setBlockData(Material.POWDER_SNOW.createBlockData());
+            Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(), () -> loc.getBlock().setBlockData(Material.AIR.createBlockData()), 20L * 7);
+        }
     }
 
     @Override
@@ -39,12 +52,12 @@ public class FrostWalker implements IWeapon {
 
     @Override
     public String getWeaponDescription() {
-        return "You are now a frost walker! Walk over ice with that boots!";
+        return "You are now a frost walker! Walk over ice with that boots and freeze the air with right click!";
     }
 
     @Override
     public String getWeaponShortDescription() {
-        return "Walk over water!";
+        return "Freeze Water and Air!";
     }
 
 }

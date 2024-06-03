@@ -207,4 +207,10 @@ public class ArenaPlayer {
     public OfflinePlayer getOfflinePlayer() {
         return Bukkit.getOfflinePlayer(uuid);
     }
+
+    public void resetScores() {
+        kills = 0;
+        deaths = 0;
+        streak = 0;
+    }
 }

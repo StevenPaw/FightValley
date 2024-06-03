@@ -4,17 +4,18 @@ import com.stevenpaw.fightvalley.common.arena.Arena;
 import com.stevenpaw.fightvalley.common.arena.ArenaPlayer;
 import com.stevenpaw.fightvalley.common.database.SQL_ArenaSpawn;
 import com.stevenpaw.fightvalley.common.database.SQL_Player;
-import org.bukkit.Location;
-import org.bukkit.Statistic;
+import org.bukkit.*;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.*;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
@@ -56,12 +57,15 @@ public class PlayerListener implements Listener {
             Player p = event.getPlayer();
             ArenaPlayer player = ArenaPlayer.GetArenaPlayer(p);
 
-            if(event.getAction() == Action.LEFT_CLICK_AIR) {
-                player.getCurrentWeapon().attack(player);
-            }
-
-            if(event.getAction() == Action.RIGHT_CLICK_AIR) {
-                player.getCurrentWeapon().activate(player);
+            switch(event.getAction()) {
+                case LEFT_CLICK_AIR, LEFT_CLICK_BLOCK:
+                    player.getCurrentWeapon().attack(player);
+                    break;
+                case RIGHT_CLICK_AIR, RIGHT_CLICK_BLOCK:
+                    player.getCurrentWeapon().activate(player);
+                    break;
+                case PHYSICAL:
+                    break;
             }
         }
     }
@@ -84,6 +88,85 @@ public class PlayerListener implements Listener {
                 ap.getCurrentArena().leaveArena(ap);
             }
             SQL_Player.setString(event.getPlayer().getUniqueId(), "CurrentArena", "");
+        }
+    }
+
+    /**
+     * Führt Aktionen aus, wenn ein Spieler ein Entity anklickt
+     * @param event (Event) = PlayerInteractEntityEvent
+     */
+    @EventHandler
+    public void onPlayerEntityInteract(PlayerInteractEntityEvent event)	{
+        if(SQL_Player.getString(event.getPlayer().getUniqueId(), "CurrentArena") != null){
+            Player p = event.getPlayer();
+            ArenaPlayer player = ArenaPlayer.GetArenaPlayer(p);
+
+            if(event.getRightClicked() instanceof Player) {
+                player.getCurrentWeapon().activate(player);
+            } else {
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    /**
+     * Führt Aktionen aus, wenn ein Spieler ein Entity anklickt
+     * @param event (Event) = PlayerInteractAtEntityEvent
+     */
+    @EventHandler
+    public void onPlayerInteractAtEntityEvent(PlayerInteractAtEntityEvent event){
+        if(SQL_Player.getString(event.getPlayer().getUniqueId(), "CurrentArena") != null) {
+            Player p = event.getPlayer();
+            ArenaPlayer player = ArenaPlayer.GetArenaPlayer(p);
+
+            if (event.getRightClicked() instanceof Player) {
+                player.getCurrentWeapon().activate(player);
+            } else {
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    /**
+     * Hunger erhöhen
+     * @param event (Event) = FoodLevelChangeEvent
+     */
+    @EventHandler
+    public void onHungerDepletion(FoodLevelChangeEvent event) {
+        Player p = (Player) event.getEntity();
+        if(SQL_Player.getString(p.getUniqueId(), "CurrentArena") != null) {
+            event.setCancelled(true);
+        }
+    }
+
+    /**
+     * Verhindert, dass Spieler Items droppen können, wenn sie nicht Builder sind
+     * @param event (Event) = PlayerDropItemEvent
+     */
+    @EventHandler
+    public void onDrop(PlayerDropItemEvent event) {
+        if(SQL_Player.getString(event.getPlayer().getUniqueId(), "CurrentArena") != null) {
+            event.setCancelled(true);
+        }
+    }
+
+    /**
+     * Bei der Aufnahme von Gold wird Geld gegeben
+     * @param event (Event) = EntityPickupItemEvent
+     */
+    @EventHandler
+    public void onPickupItem(EntityPickupItemEvent event) {
+        if(event.getEntity() instanceof Player) {
+            Player p = (Player) event.getEntity();
+
+            if(SQL_Player.getString(p.getUniqueId(), "CurrentArena") != null) {
+                if (event.getItem().getItemStack().equals(new ItemStack(Material.APPLE)))
+                {
+                    event.setCancelled(true);
+                    p.setHealth(p.getHealth()+4);
+                }
+                //TODO: Add Pickup Items
+            }
         }
     }
 }

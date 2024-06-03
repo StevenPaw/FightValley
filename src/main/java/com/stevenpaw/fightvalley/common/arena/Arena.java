@@ -3,15 +3,11 @@ package com.stevenpaw.fightvalley.common.arena;
 import com.stevenpaw.fightvalley.common.database.SQL_Arena;
 import com.stevenpaw.fightvalley.common.database.SQL_ArenaSpawn;
 import com.stevenpaw.fightvalley.common.utils.FireworkHelper;
-import com.stevenpaw.fightvalley.common.utils.Util_ItemBuilder;
 import com.stevenpaw.fightvalley.common.weapons.IWeapon;
 import com.stevenpaw.fightvalley.main.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.InvocationTargetException;
@@ -24,9 +20,11 @@ public class Arena {
     private int minPlayers;
     private int startTime = Main.defaultArenaTime;
     private int startingTime = 30;
+    private int endingTime = 10;
     private int curTime;
     private ArenaStates state;
     private List<ArenaPlayer> players;
+    private List<ArenaItemSpawn> itemSpawns;
 
     /**
      * Arena
@@ -75,6 +73,15 @@ public class Arena {
                 });
                 if (curTime <= 0) {
                     Start2();
+                }
+                break;
+            case ArenaStates.ENDING:
+                curTime--;
+                players.forEach(p -> {
+                    ArenaSidebar.updateScoreboard(p.getPlayer(), this);
+                });
+                if (curTime <= 0) {
+                    EndGame();
                 }
                 break;
         }
@@ -127,9 +134,19 @@ public class Arena {
         if(players != null) {
             List<ArenaPlayer> tempPlayers = new ArrayList<>(players);
             tempPlayers.forEach(p -> {
+                p.getPlayer().setHealth(20);
+                p.getPlayer().setFoodLevel(20);
+                p.getPlayer().setFireTicks(0);
                 leaveArena(p);
             });
         }
+        state = ArenaStates.WAITING;
+    }
+
+    public ArenaPlayer[] getScoreboard() {
+        // Sort the players by kills
+        players.sort((p1, p2) -> p2.getKills() - p1.getKills());
+        return players.toArray(new ArenaPlayer[0]);
     }
 
     /**
@@ -139,13 +156,30 @@ public class Arena {
         // Reset all players
         if(players != null) {
             List<ArenaPlayer> tempPlayers = new ArrayList<>(players);
+            ArenaPlayer[] scoreboard = getScoreboard();
+
+            int money = 20;
+            for (int i = 0; i < 2; i++) {
+                Main.getEconomy().depositPlayer(scoreboard[i].getPlayer(), money / (i + 1));
+            }
+
             tempPlayers.forEach(p -> {
-                leaveArena(p);
+                p.getPlayer().sendTitle("Game Over", scoreboard[0].getPlayer().getName() + " won!", 10, 70, 20);
+                p.getPlayer().sendMessage("§aGame Over! These are the final scores:");
+                for (int i = 0; i < scoreboard.length; i++) {
+                    p.getPlayer().sendMessage((i + 1) + ". " + scoreboard[i].getPlayer().getName() + " - " + scoreboard[i].getKills() + " kills");
+                }
+                p.getPlayer().setHealth(20);
+                p.getPlayer().setFoodLevel(20);
+                p.getPlayer().setFireTicks(0);
+                p.clearInventory();
             });
+            tempPlayers.forEach(p -> {
+                p.resetScores();
+            });
+            curTime = endingTime;
         }
-        //Change Gamestate back to waiting
-        state = ArenaStates.WAITING;
-        curTime = startTime;
+        state = ArenaStates.ENDING;
     }
 
     /**

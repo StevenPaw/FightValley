@@ -5,7 +5,9 @@ import com.stevenpaw.fightvalley.common.arena.ArenaPlayer;
 import com.stevenpaw.fightvalley.common.commands.Command;
 import com.stevenpaw.fightvalley.common.database.SQL_Arena;
 import com.stevenpaw.fightvalley.common.database.SQL_Player;
+import com.stevenpaw.fightvalley.common.listener.ItemFrameListener;
 import com.stevenpaw.fightvalley.common.listener.PlayerListener;
+import com.stevenpaw.fightvalley.common.listener.SignListener;
 import com.stevenpaw.fightvalley.common.utils.RunnableClass;
 import com.stevenpaw.fightvalley.common.weapons.*;
 import org.bukkit.Bukkit;
@@ -26,9 +28,9 @@ public class Main extends JavaPlugin {
 
     private static Main plugin;
 
-    private Economy eco = null;
-    private Permission perms = null;
-    private Chat chat = null;
+    private static Economy eco = null;
+    private static Permission perms = null;
+    private static Chat chat = null;
 
     public static String prefix = "§e[FightValley] ";
     public static File file;
@@ -77,6 +79,7 @@ public class Main extends JavaPlugin {
         weapons.add(FrostWalker.class);
         weapons.add(SpeedWalker.class);
         weapons.add(Archer.class);
+        weapons.add(Jumper.class);
 
         Bukkit.getScheduler().runTaskTimer(this, RunnableClass::runSecond, 20, 20);
         Bukkit.getScheduler().runTaskTimer(this, RunnableClass::runMinute, 20, 20*60);
@@ -124,20 +127,22 @@ public class Main extends JavaPlugin {
         return perms != null;
     }
 
-    public Economy getEconomy() {
+    public static Economy getEconomy() {
         return eco;
     }
 
-    public Permission getPermissions() {
+    public static Permission getPermissions() {
         return perms;
     }
 
-    public Chat getChat() {
+    public static Chat getChat() {
         return chat;
     }
 
     private void registerEvents(){
         PluginManager pm = Bukkit.getPluginManager();
         pm.registerEvents(new PlayerListener(), this);
+        pm.registerEvents(new ItemFrameListener(), this);
+        pm.registerEvents(new SignListener(), this);
     }
 }

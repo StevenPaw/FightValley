@@ -17,7 +17,8 @@ public class Archer implements IWeapon {
 
     @Override
     public void activate(ArenaPlayer ap) {
-        ap.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 10, 10, false, false));
+        ap.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 20, 2, false, false));
+        ap.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 10, 1, false, false));
     }
 
     @Override

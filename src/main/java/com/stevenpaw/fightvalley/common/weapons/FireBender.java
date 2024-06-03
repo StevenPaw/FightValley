@@ -28,7 +28,7 @@ public class FireBender implements IWeapon {
         Location loc = ap.getPlayer().getLocation();
         if(loc.getBlock().getType() == Material.AIR) {
             loc.getBlock().setBlockData(Material.FIRE.createBlockData());
-            Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(), () -> loc.getBlock().setBlockData(Material.AIR.createBlockData()), 20L * 5);
+            Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(), () -> loc.getBlock().setBlockData(Material.AIR.createBlockData()), 20L * 4);
         }
     }
 

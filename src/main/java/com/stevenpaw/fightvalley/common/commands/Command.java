@@ -125,7 +125,7 @@ public class Command implements TabExecutor {
 
     private void createArena(CommandSender sender, String[] args) {
         //fightvalley createArena <name> <minPlayers> <maxPlayers>
-        if(args.length < 4 || args.length > 4) {
+        if(args.length != 4) {
             sender.sendMessage("§cUsage: /fightvalley createarena <name> <minPlayers> <maxPlayers>");
         } else {
             String name = args[1];

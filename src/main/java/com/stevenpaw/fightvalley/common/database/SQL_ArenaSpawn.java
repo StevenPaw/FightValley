@@ -87,7 +87,7 @@ public class SQL_ArenaSpawn {
     public static List<String> getSpawnIDs(String arena) {
         List<String> ids = new ArrayList<>();
         try {
-            final ResultSet res = MySQL.getResult("SELECT ID FROM FightValley_Arena WHERE Arena= '" + arena + "'");
+            final ResultSet res = MySQL.getResult("SELECT ID FROM FightValley_ArenaSpawn WHERE Arena= '" + arena + "'");
             assert res != null;
             int i = 0;
             while (res.next()) {
