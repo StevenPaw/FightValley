@@ -11,9 +11,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 
@@ -81,7 +83,7 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void OnPlayerJoin(PlayerJoinEvent event) {
-        if(SQL_Player.getString(event.getPlayer().getUniqueId(), "CurrentArena") != null){
+        if(ArenaPlayer.isInArena(event.getPlayer())){
             ArenaPlayer ap = ArenaPlayer.GetArenaPlayer(event.getPlayer());
             if(ap.getCurrentArena() != null){
                 event.getPlayer().teleport(ap.getCurrentArena().getExit());
@@ -97,13 +99,13 @@ public class PlayerListener implements Listener {
      */
     @EventHandler
     public void onPlayerEntityInteract(PlayerInteractEntityEvent event)	{
-        if(SQL_Player.getString(event.getPlayer().getUniqueId(), "CurrentArena") != null){
+        if(ArenaPlayer.isInArena(event.getPlayer())){
             Player p = event.getPlayer();
             ArenaPlayer player = ArenaPlayer.GetArenaPlayer(p);
 
             if(event.getRightClicked() instanceof Player) {
                 player.getCurrentWeapon().activate(player);
-            } else {
+            } else if (event.getRightClicked() instanceof ArmorStand) {
                 event.setCancelled(true);
             }
         }
@@ -115,13 +117,13 @@ public class PlayerListener implements Listener {
      */
     @EventHandler
     public void onPlayerInteractAtEntityEvent(PlayerInteractAtEntityEvent event){
-        if(SQL_Player.getString(event.getPlayer().getUniqueId(), "CurrentArena") != null) {
+        if(ArenaPlayer.isInArena(event.getPlayer())){
             Player p = event.getPlayer();
             ArenaPlayer player = ArenaPlayer.GetArenaPlayer(p);
 
             if (event.getRightClicked() instanceof Player) {
                 player.getCurrentWeapon().activate(player);
-            } else {
+            } else if (event.getRightClicked() instanceof ArmorStand) {
                 event.setCancelled(true);
             }
         }
@@ -134,7 +136,7 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onHungerDepletion(FoodLevelChangeEvent event) {
         Player p = (Player) event.getEntity();
-        if(SQL_Player.getString(p.getUniqueId(), "CurrentArena") != null) {
+        if(ArenaPlayer.isInArena(p)){
             event.setCancelled(true);
         }
     }
@@ -145,7 +147,7 @@ public class PlayerListener implements Listener {
      */
     @EventHandler
     public void onDrop(PlayerDropItemEvent event) {
-        if(SQL_Player.getString(event.getPlayer().getUniqueId(), "CurrentArena") != null) {
+        if(ArenaPlayer.isInArena(event.getPlayer())){
             event.setCancelled(true);
         }
     }
@@ -159,13 +161,46 @@ public class PlayerListener implements Listener {
         if(event.getEntity() instanceof Player) {
             Player p = (Player) event.getEntity();
 
-            if(SQL_Player.getString(p.getUniqueId(), "CurrentArena") != null) {
+            if(ArenaPlayer.isInArena(p)){
                 if (event.getItem().getItemStack().equals(new ItemStack(Material.APPLE)))
                 {
                     event.setCancelled(true);
                     p.setHealth(p.getHealth()+4);
                 }
                 //TODO: Add Pickup Items
+            }
+        }
+    }
+
+    @EventHandler
+    public void onPlayerCommand(PlayerCommandPreprocessEvent event) {
+        if(ArenaPlayer.isInArena(event.getPlayer())){
+            String[] splittedMessage = event.getMessage().split(" ");
+            if(!splittedMessage[0].equalsIgnoreCase("/fv") && !splittedMessage[0].equalsIgnoreCase("/fightvalley")) {
+                event.getPlayer().sendMessage(ChatColor.RED + "Du kannst in der Arena keine Befehle ausführen!" + ChatColor.GRAY + " (Außer /fv oder /fightvalley)");
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onPlayerDamage(EntityDamageByEntityEvent event) {
+
+        Player p = (Player) event.getEntity();
+
+        if(ArenaPlayer.isInArena(p)) {
+            if(ArenaPlayer.isInLobby(p)) {
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onHangingBreakByEntity(HangingBreakByEntityEvent event) {
+        if(event.getEntity() instanceof Player) {
+            Player p = (Player) event.getEntity();
+            if(ArenaPlayer.isInArena(p)){
+                event.setCancelled(true);
             }
         }
     }

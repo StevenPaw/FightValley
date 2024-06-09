@@ -1,6 +1,7 @@
 package com.stevenpaw.fightvalley.common.listener;
 
-import com.stevenpaw.fightvalley.common.database.SQL_Player;
+import com.stevenpaw.fightvalley.common.arena.ArenaPlayer;
+import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -18,10 +19,10 @@ public class ItemFrameListener implements Listener {
      */
     @EventHandler
     public void onPlayerEntityInteract(PlayerInteractEntityEvent event) {
-        Player p = event.getPlayer();
-
-        if(SQL_Player.getString(p.getUniqueId(), "CurrentArena") != null) {
-            event.setCancelled(true);
+        if(ArenaPlayer.isInArena(event.getPlayer())){
+            if(event.getRightClicked() instanceof ItemFrame) {
+                event.setCancelled(true);
+            }
         }
     }
 
@@ -34,7 +35,7 @@ public class ItemFrameListener implements Listener {
     public void onHangingBreakByEntity(HangingBreakByEntityEvent event) {
         if(event.getEntity() instanceof Player) {
             Player p = (Player) event.getEntity();
-            if (SQL_Player.getString(p.getUniqueId(), "CurrentArena") != null) {
+            if(ArenaPlayer.isInArena(p)){
                 event.setCancelled(true);
             }
         }
@@ -47,11 +48,13 @@ public class ItemFrameListener implements Listener {
      */
     @EventHandler
     public void itemFrameItemRemoval(EntityDamageByEntityEvent event) {
-        if(event.getEntity() instanceof Player) {
-            Player p = (Player) event.getEntity();
+        if(event.getDamager() instanceof Player) {
+            Player p = (Player) event.getDamager();
 
-            if (SQL_Player.getString(p.getUniqueId(), "CurrentArena") != null) {
-                event.setCancelled(true);
+            if(event.getEntity() instanceof ItemFrame) {
+                if(ArenaPlayer.isInArena(p)){
+                    event.setCancelled(true);
+                }
             }
         }
     }
@@ -66,7 +69,7 @@ public class ItemFrameListener implements Listener {
         if(event.getEntity() instanceof Player) {
             Player p = (Player) event.getEntity();
 
-            if (SQL_Player.getString(p.getUniqueId(), "CurrentArena") != null) {
+            if(ArenaPlayer.isInArena(p)){
                 event.setCancelled(true);
             }
         }

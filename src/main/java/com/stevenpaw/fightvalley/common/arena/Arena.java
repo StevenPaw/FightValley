@@ -321,6 +321,7 @@ public class Arena {
                 }
             }
             p.emptyCurrentArena(); //Do this last to prevent errors
+            p.emptyCurrentWeapon();
         }
     }
 

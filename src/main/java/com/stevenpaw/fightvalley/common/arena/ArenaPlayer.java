@@ -104,7 +104,12 @@ public class ArenaPlayer {
 
     public void emptyCurrentArena() {
         this.currentArena = null;
-        SQL_Player.setString(uuid, "CurrentArena", "");
+        SQL_Player.setString(uuid, "CurrentArena", null);
+    }
+
+    public void emptyCurrentWeapon() {
+        this.currentWeapon = null;
+        SQL_Player.setString(uuid, "CurrentWeapon", null);
     }
 
     public void setGameMode(GameMode gameMode) {
@@ -178,6 +183,12 @@ public class ArenaPlayer {
     public static boolean isInArena(Player player) {
         ArenaPlayer ap = ArenaPlayer.GetArenaPlayer(player);
         return ap.getCurrentArena() != null;
+    }
+
+    public static boolean isInLobby(Player player) {
+        ArenaPlayer ap = ArenaPlayer.GetArenaPlayer(player);
+        Arena a = ap.getCurrentArena();
+        return a != null && (a.getState() == ArenaStates.WAITING || a.getState() == ArenaStates.STARTING);
     }
 
     public int getDeaths() {

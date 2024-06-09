@@ -109,7 +109,11 @@ public class SQL_Player {
         if (!playerExists(uuid)) {
             createPlayer(uuid);
         }
-        MySQL.update("UPDATE FightValley_Player SET "+column+"= '"+string+"' WHERE UUID= '"+uuid+"';");
+        if(string == null) {
+            MySQL.update("UPDATE FightValley_Player SET "+column+"= NULL WHERE UUID= '"+uuid+"';");
+        } else {
+            MySQL.update("UPDATE FightValley_Player SET " + column + "= '" + string + "' WHERE UUID= '" + uuid + "';");
+        }
     }
 
     /**

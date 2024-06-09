@@ -28,7 +28,7 @@ public class Jumper implements IWeapon {
     @Override
     public ItemStack[] getItems() {
         ItemStack[] items = new ItemStack[1];
-        items[0] = new Util_ItemBuilder(Material.STONE_AXE)
+        items[0] = new Util_ItemBuilder(Material.STONE_SHOVEL)
                 .setDisplayName("Jumper Axe")
                 .setEnchantment(Enchantment.KNOCKBACK, 1)
                 .setLore("An Axe for the arena")
