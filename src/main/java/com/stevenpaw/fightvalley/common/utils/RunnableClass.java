@@ -1,5 +1,6 @@
 package com.stevenpaw.fightvalley.common.utils;
 
+import com.stevenpaw.fightvalley.common.arena.ArenaSign;
 import com.stevenpaw.fightvalley.common.arena.ArenaStates;
 import com.stevenpaw.fightvalley.main.Main;
 import net.kyori.adventure.text.TextComponent;
@@ -22,6 +23,12 @@ public class RunnableClass {
             Main.arenas.forEach((k, v) -> {
                 v.Tick();
             });
+        }
+    }
+
+    public static void runFiveSecond() {
+        if(Main.arenas.size() > 0) {
+            ArenaSign.UpdateSigns();
         }
     }
 }

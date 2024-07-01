@@ -1,16 +1,13 @@
 package com.stevenpaw.fightvalley.common.listener;
 
-import com.stevenpaw.fightvalley.common.arena.Arena;
 import com.stevenpaw.fightvalley.common.arena.ArenaPlayer;
 import com.stevenpaw.fightvalley.common.database.SQL_ArenaSpawn;
 import com.stevenpaw.fightvalley.common.database.SQL_Player;
 import org.bukkit.*;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
@@ -186,11 +183,12 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onPlayerDamage(EntityDamageByEntityEvent event) {
 
-        Player p = (Player) event.getEntity();
-
-        if(ArenaPlayer.isInArena(p)) {
-            if(ArenaPlayer.isInLobby(p)) {
-                event.setCancelled(true);
+        if(event.getDamager() instanceof Player && event.getEntity() instanceof Player) {
+            Player p = (Player) event.getDamager();
+            if(ArenaPlayer.isInArena(p)) {
+                if(ArenaPlayer.isInLobby(p)) {
+                    event.setCancelled(true);
+                }
             }
         }
     }
@@ -202,6 +200,13 @@ public class PlayerListener implements Listener {
             if(ArenaPlayer.isInArena(p)){
                 event.setCancelled(true);
             }
+        }
+    }
+
+    @EventHandler
+    public void onItemPickup(PlayerPickupItemEvent e){
+        if(ArenaPlayer.isInArena(e.getPlayer())){
+            e.setCancelled(true);
         }
     }
 }

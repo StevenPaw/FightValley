@@ -109,7 +109,6 @@ public class ArenaPlayer {
 
     public void emptyCurrentWeapon() {
         this.currentWeapon = null;
-        SQL_Player.setString(uuid, "CurrentWeapon", null);
     }
 
     public void setGameMode(GameMode gameMode) {

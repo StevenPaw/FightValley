@@ -56,6 +56,11 @@ public class Arena {
         switch (state) {
             default:
                 break;
+            case ArenaStates.WAITING:
+                players.forEach(p -> {
+                    ArenaSidebar.updateScoreboard(p.getPlayer(), this);
+                });
+                break;
             case ArenaStates.RUNNING:
                 curTime--;
                 players.forEach(p -> {

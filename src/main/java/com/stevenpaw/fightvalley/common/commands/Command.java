@@ -443,6 +443,13 @@ public class Command implements TabExecutor {
         List<String> arenaNames = SQL_Arena.getArenaNames();
         if (args.length == 1) {
             return Arrays.asList("create", "delete", "addspawn", "highlightSpawns", "setlobby", "setexit", "removespawn", "join", "start", "list", "players", "stop", "leave");
+            /*List<String> options = Arrays.asList("create", "delete", "addspawn", "highlightSpawns", "setlobby", "setexit", "removespawn", "join", "start", "list", "players", "stop", "leave");
+            for (String option : options) {
+                if (!option.toLowerCase().startsWith(args[0].toLowerCase())) {
+                    options.remove(option);
+                }
+            }
+            return options;*/
         } else if (args.length == 2) {
             switch (args[0]) {
                 case "create":

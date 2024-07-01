@@ -1,6 +1,7 @@
 package com.stevenpaw.fightvalley.common.database;
 
 import com.stevenpaw.fightvalley.common.arena.ArenaItemSpawn;
+import com.stevenpaw.fightvalley.common.items.HealthApple;
 import com.stevenpaw.fightvalley.common.items.IArenaItem;
 import com.stevenpaw.fightvalley.main.MySQL;
 import org.bukkit.Location;
@@ -124,18 +125,23 @@ public class SQL_ArenaItemSpawn {
 
 
     public static List<ArenaItemSpawn> getItemSpawns(String arena) {
-        /*
         List<ArenaItemSpawn> spawns = new ArrayList<>();
         try {
             final ResultSet res = MySQL.getResult("SELECT * FROM FightValley_ArenaItemSpawn WHERE Arena= '" + arena + "'");
             assert res != null;
+            IArenaItem item = null;
+            switch (res.getString("Item")) {
+                case "HealthApple":
+                    item = new HealthApple();
+                    break;
+            }
             while (res.next()) {
                 spawns.add(new ArenaItemSpawn(
                         SQL_Arena.getLobby(arena).getWorld(),
                         res.getInt("PosX"),
                         res.getInt("PosY"),
                         res.getInt("PosZ"),
-
+                        item
                 ));
             }
             return spawns;
@@ -144,7 +150,5 @@ public class SQL_ArenaItemSpawn {
             e.printStackTrace();
             return null;
         }
-        */
-        return null;
     }
 }

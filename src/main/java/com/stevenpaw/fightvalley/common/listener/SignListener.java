@@ -2,8 +2,10 @@ package com.stevenpaw.fightvalley.common.listener;
 
 import com.stevenpaw.fightvalley.common.arena.Arena;
 import com.stevenpaw.fightvalley.common.arena.ArenaPlayer;
+import com.stevenpaw.fightvalley.common.arena.ArenaSign;
 import com.stevenpaw.fightvalley.common.arena.ArenaStates;
 import com.stevenpaw.fightvalley.common.database.SQL_Arena;
+import com.stevenpaw.fightvalley.common.database.SQL_Sign;
 import com.stevenpaw.fightvalley.main.Main;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
@@ -38,6 +40,7 @@ public class SignListener implements Listener {
                 Sign sign = (Sign) event.getBlock().getState();
 
                 if (SQL_Arena.arenaExists(event.getLine(1))) {
+                    event.getPlayer().sendMessage(ChatColor.GREEN + "Sign created!");
                     Arena arena = SQL_Arena.getArenas().get(event.getLine(1));
                     sign.getPersistentDataContainer().set(new NamespacedKey(Main.getPlugin(), "arena"), PersistentDataType.STRING, arena.getName());
                     Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(), () -> {
@@ -45,7 +48,15 @@ public class SignListener implements Listener {
                         sign.setLine(1, ChatColor.GREEN + "Join");
                         sign.setLine(2, ChatColor.BLACK + arena.getName());
                         sign.update(true);
+
+                        if(SQL_Sign.signExists(sign.getLocation())) {
+                            event.getPlayer().sendMessage(ChatColor.RED + "Sign already exists!");
+                            return;
+                        } else {
+                            SQL_Sign.createSign(sign.getLocation(), arena.getName());
+                        }
                     }, 1);
+
                 } else {
                     sign.setColor(DyeColor.RED);
                     event.getPlayer().sendMessage(ChatColor.RED + "Arena " + event.getLine(1) + " existiert nicht!");
@@ -63,8 +74,9 @@ public class SignListener implements Listener {
         }
         if (event.getClickedBlock().getState() instanceof Sign)     {
             Sign sign = (Sign) event.getClickedBlock().getState();
-            if (sign.getPersistentDataContainer().has(new NamespacedKey(Main.getPlugin(), "arena"), PersistentDataType.STRING)) {
-                Arena arena = Main.arenas.get(sign.getPersistentDataContainer().get(new NamespacedKey(Main.getPlugin(), "arena"), PersistentDataType.STRING));
+            if (Main.signs.containsKey(sign.getLocation())) {
+                ArenaSign arenaSign = Main.signs.get(sign.getLocation());
+                Arena arena = Main.arenas.get(arenaSign.getArenaName());
                 if (arena != null) {
                     ArenaPlayer ap = ArenaPlayer.GetArenaPlayer(event.getPlayer().getUniqueId());
                     if (ap != null) {

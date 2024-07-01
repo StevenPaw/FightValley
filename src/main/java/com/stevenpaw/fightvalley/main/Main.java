@@ -2,15 +2,19 @@ package com.stevenpaw.fightvalley.main;
 
 import com.stevenpaw.fightvalley.common.arena.Arena;
 import com.stevenpaw.fightvalley.common.arena.ArenaPlayer;
+import com.stevenpaw.fightvalley.common.arena.ArenaSign;
 import com.stevenpaw.fightvalley.common.commands.Command;
 import com.stevenpaw.fightvalley.common.database.SQL_Arena;
 import com.stevenpaw.fightvalley.common.database.SQL_Player;
+import com.stevenpaw.fightvalley.common.database.SQL_Sign;
 import com.stevenpaw.fightvalley.common.listener.ItemFrameListener;
 import com.stevenpaw.fightvalley.common.listener.PlayerListener;
 import com.stevenpaw.fightvalley.common.listener.SignListener;
 import com.stevenpaw.fightvalley.common.utils.RunnableClass;
 import com.stevenpaw.fightvalley.common.weapons.*;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.block.Sign;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.PluginManager;
@@ -43,6 +47,7 @@ public class Main extends JavaPlugin {
     public static HashMap<String, Arena> arenas;
     public static HashMap<UUID, ArenaPlayer> arenaPlayers;
     public static List<Class<? extends IWeapon>> weapons;
+    public static HashMap<Location, ArenaSign> signs = new HashMap<>();
     public static int defaultArenaTime = 120;
 
     @Override
@@ -73,6 +78,9 @@ public class Main extends JavaPlugin {
         arenas = SQL_Arena.getArenas();
         arenaPlayers = new HashMap<>();
         arenaPlayers = SQL_Player.getAllPlayers();
+        signs = new HashMap<>();
+        signs = SQL_Sign.getSigns();
+
         weapons = new ArrayList<>();
         weapons.add(Fighter.class);
         weapons.add(FireBender.class);
@@ -80,8 +88,11 @@ public class Main extends JavaPlugin {
         weapons.add(SpeedWalker.class);
         weapons.add(Archer.class);
         weapons.add(Jumper.class);
+        weapons.add(Siren.class);
+        weapons.add(Pilot.class);
 
         Bukkit.getScheduler().runTaskTimer(this, RunnableClass::runSecond, 20, 20);
+        Bukkit.getScheduler().runTaskTimer(this, RunnableClass::runFiveSecond, 20, 20 * 5);
         Bukkit.getScheduler().runTaskTimer(this, RunnableClass::runMinute, 20, 20*60);
 
         Objects.requireNonNull(getCommand("fightvalley")).setExecutor(new Command());
